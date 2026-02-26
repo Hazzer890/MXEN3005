@@ -1,0 +1,26 @@
+M2.1
+ros2 run turtlesim turtlesim_node --ros-args --remap __name:=turtles --remap /turtle1/cmd_vel:=/ninja/leonardo/cmd_vel
+
+ros2 run turtlesim turtlesim_node --ros-args --remap __name:=turtles --remap __ns:=/ninja
+
+M2.2
+ros2 service call /ninja/kill turtlesim_msgs/srv/Kill "{name: 'turtle1'}"
+
+ros2 service call /ninja/spawn turtlesim_msgs/srv/Spawn "{x: 6, y: 6, name: 'leonardo'}"
+ros2 service call /ninja/spawn turtlesim_msgs/srv/Spawn "{x: 1, y: 1, theta: 1.57, name: 'donatello'}"
+
+M2.3
+ros2 param set turtles background_b 34 // abunch of times rgb and with ninja/turtle
+ros2 service call /ninja/leonardo/set_pen turtlesim_msgs/srv/SetPen "{r: 135, g: 206, b: 235, width: 5}" // for all turtles and colours
+
+M2.4
+ros2 run turtlesim turtle_teleop_key --ros-args --remap /turtle1/cmd_vel:=/ninja/leonardo/cmd_vel
+
+M2.5
+ros2 pkg list | grep teleop
+ros2 pkg executables teleop_twist_keyboard
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+ros2 topic list -t
+
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap /cmd_vel:=/ninja/donatello/cmd_vel
+
