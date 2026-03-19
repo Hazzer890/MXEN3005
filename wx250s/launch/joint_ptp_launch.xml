@@ -1,0 +1,8 @@
+<launch>
+  <executable cmd="/usr/bin/env xarmserver" />
+  <node pkg="wx250s" exec="homing_node"/>
+  <node pkg="wx250s" exec="gripper_node"/>
+  <node pkg="wx250s" exec="joint_ptp_node"/>
+  <node pkg="wx250s" exec="joint_state_node"/>
+
+</launch>
