@@ -1,0 +1,17 @@
+Call Action - move arm:
+ros2 action send_goal /joint_ptp_action wx250s_interface/action/JointPTP "{joint_goal: [0, 28, -56, -1, -56, 4]}"
+
+Call Service - home arm (/homing):
+ros2 service call /homing std_srvs/srv/Trigger
+
+Publish to Topic - gripper state (bool):
+ros2 topic pub /grip std_msgs/msg/Bool '{data: False}'
+
+
+
+Build + Install:
+colcon build
+source install/local_setup.bash
+
+Launch Package:
+ros2 launch wx250s joint_ptp_launch.xml
