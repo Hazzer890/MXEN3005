@@ -1,4 +1,5 @@
 import rclpy
+import math
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
@@ -17,7 +18,8 @@ class Leader(Node):
 
     def timer_callback(self):
         joint = JointState()
-        joint.position = self.xarm.get_joints()
+        joint_position_degrees = self.xarm.get_joints()
+        joint.position = type(xs)(math.radians(x) for x in joint_position_degrees)
         self.publisher.publish(joint)
         # self.get_logger().info(f"Publishing: {joint}")
 
