@@ -7,6 +7,8 @@ from wx250s_interface.action import JointPTP
 from sensor_msgs.msg import JointState
 from xarmclient import XArm
 
+joint_names = ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+
 class Leader(Node):
 
     def __init__(self):
@@ -19,7 +21,8 @@ class Leader(Node):
     def timer_callback(self):
         joint = JointState()
         joint_position_degrees = self.xarm.get_joints()
-        joint.position = type(xs)(math.radians(x) for x in joint_position_degrees)
+        joint.position = [math.radians(x) for x in joint_position_degrees]
+        joint.name = joint_names
         self.publisher.publish(joint)
         # self.get_logger().info(f"Publishing: {joint}")
 
