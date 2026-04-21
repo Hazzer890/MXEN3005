@@ -157,7 +157,7 @@
     <parent link="link1" />
     <child link="link2" />
     <origin xyz="0 0 ${L1_HEIGHT}" rpy="0 0 0" />
-    <axis xyz="0 1 0" />
+    <axis xyz="0 ${-1} 0" />
     <limit lower="${J2_MIN}" upper="${J2_MAX}" effort="1" velocity="1" />
   </joint>
 
@@ -165,7 +165,7 @@
     <parent link="link2" />
     <child link="link3" />
     <origin xyz="0 0 ${L2_HEIGHT}" rpy="0 0 0" />
-    <axis xyz="0 1 0" />
+    <axis xyz="0 ${-1} 0" />
     <limit lower="${J3_MIN}" upper="${J3_MAX}" effort="1" velocity="1" />
   </joint>
 
@@ -182,7 +182,7 @@
     <parent link="link4" />
     <child link="link5" />
     <origin xyz="${L4_HEIGHT} 0 0" rpy="0 0 0" />
-    <axis xyz="0 1 0" />
+    <axis xyz="0 ${-1} 0" />
     <limit lower="${J5_MIN}" upper="${J5_MAX}" effort="1" velocity="1" />
   </joint>
 
