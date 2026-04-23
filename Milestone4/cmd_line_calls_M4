@@ -11,7 +11,7 @@ ros2 topic pub /grip std_msgs/msg/Bool '{data: False}'
 
 Build + Install:
 colcon build
-source install/local_setup.bash
+source install/setup.bash
 
 Launch Package:
 ros2 launch wx250s joint_ptp_launch.xml

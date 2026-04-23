@@ -1,0 +1,28 @@
+Step 1: Launch Visualisation
+ - Go to Milestone 5 folder
+colcon build
+source install/setup.bash
+ros2 launch wx250s_viz wx250s_twin_viz_launch.xml
+
+Step 2: Start Robot
+ - Turn robot on
+ - Go to Milestone 4 folder
+colcon build
+source install/setup.bash
+ros2 launch wx250s joint_ptp_launch.xml
+
+
+Step 3: Move Robot
+ - Turn robot on
+ - Go to Milestone 4 folder
+colcon build
+source install/setup.bash
+
+Move arm:
+ros2 action send_goal /joint_ptp_action wx250s_interface/action/JointPTP "{joint_goal: [0, 28, -56, -1, -56, 4]}"
+
+Home arm (/homing):
+ros2 service call /homing std_srvs/srv/Trigger
+
+Set Gripper state (bool):
+ros2 topic pub /grip std_msgs/msg/Bool '{data: False}'
