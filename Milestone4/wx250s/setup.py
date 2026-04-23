@@ -31,7 +31,9 @@ setup(
             'homing_node = wx250s.homing_node:main',
             'gripper_node = wx250s.gripper_node:main',
             'joint_state_node = wx250s.joint_state_node:main',
+            'pose_node = wx250s.pose_node:main',
             'joint_ptp_node = wx250s.joint_ptp_node:main',
+            'cartesian_ptp_node = wx250s.cartesian_ptp_node:main',
         ],
     },
 )

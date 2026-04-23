@@ -11,7 +11,7 @@ find_package(rosidl_default_generators REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
-set(interface_files "action/JointPTP.action")
+set(interface_files "action/CartesianPTP.action" "action/JointPTP.action")
 
 rosidl_generate_interfaces(${PROJECT_NAME} 
   ${interface_files}
