@@ -1,3 +1,18 @@
+
+# Individual Robot Visualisation
+ - Go to Milestone 5 folder
+colcon build
+source install/setup.bash
+
+ - Robot 1
+ros2 launch robots_viz robots_viz_launch.xml
+
+ - Robot 2
+ros2 launch robots_viz robot2_viz_launch.xml
+
+
+
+# Twin Robot Visualisation
 Step 1: Launch Visualisation
  - Go to Milestone 5 folder
 colcon build
