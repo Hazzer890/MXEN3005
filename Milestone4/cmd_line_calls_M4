@@ -1,6 +1,10 @@
 Call Action - move arm:
 ros2 action send_goal /joint_ptp_action wx250s_interface/action/JointPTP "{joint_goal: [0, 28, -56, -1, -56, 4]}"
 
+Call Action - move arm to cartesian:
+ros2 action send_goal /joint_ptp_action wx250s_interface/action/JointPTP "{x: 100, y: 100, z: 100}"
+
+
 Call Service - home arm (/homing):
 ros2 service call /homing std_srvs/srv/Trigger
 
