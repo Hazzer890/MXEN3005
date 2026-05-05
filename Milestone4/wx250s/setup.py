@@ -34,6 +34,7 @@ setup(
             'pose_node = wx250s.pose_node:main',
             'joint_ptp_node = wx250s.joint_ptp_node:main',
             'cartesian_ptp_node = wx250s.cartesian_ptp_node:main',
+            'pick_and_place_node = wx250s.pick_and_place_node:main',
         ],
     },
 )

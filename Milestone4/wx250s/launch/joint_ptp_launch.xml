@@ -6,5 +6,6 @@
   <node pkg="wx250s" exec="joint_state_node"/>
   <node pkg="wx250s" exec="pose_node"/>
   <node pkg="wx250s" exec="cartesian_ptp_node"/>
+  <node pkg="wx250s" exec="pick_and_place_node"/>
 
 </launch>
