@@ -4,7 +4,7 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
 from wx250s_interface.action import JointPTP
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseStamped
 from xarmclient import XArm
 
 import wx250s_kinematics
@@ -15,13 +15,13 @@ class Leader(Node):
 
     def __init__(self):
         super().__init__("joint_state_node")
-        self.publisher = self.create_publisher(Pose, "/Pose", 10)
+        self.publisher = self.create_publisher(PoseStamped, "/Pose", 10)
         self.xarm = XArm()
         timer_period = 0.1  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
     def timer_callback(self):
-        pose = Pose()
+        pose = PoseStamped()
         joint_position_degrees = self.xarm.get_joints()
 
 
@@ -32,15 +32,17 @@ class Leader(Node):
 
         rotation_matrix = Rotation.from_matrix(rotation_matrix)
 
-        pose.position.x = translation[0]
-        pose.position.y = translation[1]
-        pose.position.z = translation[2]
+        pose.pose.position.x = translation[0] / 1000
+        pose.pose.position.y = translation[1] / 1000
+        pose.pose.position.z = translation[2] / 1000
 
         quat = rotation_matrix.as_quat()
-        pose.orientation.x = quat[0]
-        pose.orientation.y = quat[1]
-        pose.orientation.z = quat[2]
-        pose.orientation.w = quat[3]
+        pose.pose.orientation.x = quat[0]
+        pose.pose.orientation.y = quat[1]
+        pose.pose.orientation.z = quat[2]
+        pose.pose.orientation.w = quat[3]
+
+        pose.header.frame_id = "base"
 
         self.publisher.publish(pose)
         # self.get_logger().info(f"Pose: {pose}")

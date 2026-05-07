@@ -9,7 +9,7 @@ Call Service - home arm (/homing):
 ros2 service call /homing std_srvs/srv/Trigger
 
 Call Service - pick and place arm (/pick_and_place):
-ros2 service call /pick_and_place wx250s_interface/srv/PickAndPlace "{xpick: -100, ypick: 100, xplace: 100, yplace: 100}"
+ros2 service call /pick_and_place wx250s_interface/srv/PickAndPlace "{xpick: 300, ypick: -100, xplace: 300, yplace: 100}"
 
 
 Publish to Topic - gripper state (bool):

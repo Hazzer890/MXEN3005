@@ -8,6 +8,8 @@ Panels:
         - /Status1
         - /RobotModel1
         - /TF1
+        - /TF1/Frames1
+        - /Pose1
       Splitter Ratio: 0.5
     Tree Height: 652
   - Class: rviz_common/Selection
@@ -71,6 +73,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         ee:
           Alpha: 1
           Show Axes: false
@@ -87,6 +90,21 @@ Visualization Manager:
           Show Trail: false
           Value: true
         link3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link6:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -109,19 +127,25 @@ Visualization Manager:
       Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
         base:
-          Value: true
+          Value: false
         ee:
-          Value: true
+          Value: false
         link1:
-          Value: true
+          Value: false
         link2:
-          Value: true
+          Value: false
         link3:
-          Value: true
+          Value: false
+        link4:
+          Value: false
+        link5:
+          Value: false
+        link6:
+          Value: false
         world:
-          Value: true
+          Value: false
       Marker Scale: 0.30000001192092896
       Name: TF
       Show Arrows: true
@@ -133,9 +157,32 @@ Visualization Manager:
             link1:
               link2:
                 link3:
-                  ee:
-                    {}
+                  link4:
+                    link5:
+                      link6:
+                        ee:
+                          {}
       Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz_default_plugins/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Axes
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /Pose
       Value: true
   Enabled: true
   Global Options:
@@ -183,7 +230,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.044280767440796
+      Distance: 2.458840847015381
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -198,10 +245,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.46539849042892456
+      Pitch: 0.40039846301078796
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.0703984498977661
+      Yaw: 6.008581638336182
     Saved: ~
 Window Geometry:
   Displays:

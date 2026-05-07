@@ -48,7 +48,7 @@ def calculate_intermediate_targets(self, x, y, z):
 def inverse_kinematics(self, x, y, z, current_joints):
 
     roll = 0
-    pitch = -90
+    pitch = 90
     yaw = 0
 
     translation = np.array((x, y, z))
@@ -59,6 +59,7 @@ def inverse_kinematics(self, x, y, z, current_joints):
     htm = np.zeros((3, 4))
     htm[:3, :3] = rotation_matrix
     htm[:3, -1] = translation
+    self.get_logger().info(f"htm: {htm}")
 
     joints = wx250s_kinematics.ik(current_joints, htm)
     
@@ -134,12 +135,15 @@ class PickAndPlaceNode(Node):
         # above pick
         if self.move_to_point(msg.xpick, msg.ypick, 150) == False:
             self.get_logger().info(f"I give up")
+        self.xarm.grip(False)
+        time.sleep(1)
 
         # pick
-        if self.move_to_point(msg.xpick, msg.ypick, 50) == False:
+        if self.move_to_point(msg.xpick, msg.ypick, 10) == False:
             self.get_logger().info(f"I give up")
         
         self.xarm.grip(True)
+        time.sleep(1)
 
         # above pick
         if self.move_to_point(msg.xpick, msg.ypick, 150) == False:
@@ -150,9 +154,10 @@ class PickAndPlaceNode(Node):
             self.get_logger().info(f"I give up")
         
         # place
-        if self.move_to_point(msg.xplace, msg.yplace, 50) == False:
+        if self.move_to_point(msg.xplace, msg.yplace, 10) == False:
             self.get_logger().info(f"I give up")
         self.xarm.grip(False)
+        time.sleep(1)
 
         # above place
         if self.move_to_point(msg.xplace, msg.yplace, 150) == False:
