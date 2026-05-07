@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="ourbeloved" exec="fire_controller_node"/>
+
+
+</launch>
