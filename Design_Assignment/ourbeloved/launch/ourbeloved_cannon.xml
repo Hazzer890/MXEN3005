@@ -1,5 +1,7 @@
 <launch>
+    <executable cmd="/usr/bin/env xarmserver" />
     <node pkg="ourbeloved" exec="fire_controller_node"/>
+    <node pkg="ourbeloved" exec="homing_controller_node"/>
 
 
 </launch>
