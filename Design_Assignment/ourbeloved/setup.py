@@ -31,7 +31,7 @@ setup(
     entry_points={
         'console_scripts': [
             'fire_controller_node = ourbeloved.fire_controller_node:main',
-            'homing_controller_node = ourbeloved.homing_controller_node:main',
+            'robot_controller_node = ourbeloved.robot_controller_node:main',
 
         ],
     },

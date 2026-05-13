@@ -1,7 +1,8 @@
 <launch>
-    <executable cmd="/usr/bin/env xarmserver" />
+    <!--executable cmd="/usr/bin/env xarmserver" -->
+    <executable cmd="bash -c xarmserver_sim"/>
     <node pkg="ourbeloved" exec="fire_controller_node"/>
-    <node pkg="ourbeloved" exec="homing_controller_node"/>
+    <node pkg="ourbeloved" exec="robot_controller_node"/>
 
 
 </launch>
