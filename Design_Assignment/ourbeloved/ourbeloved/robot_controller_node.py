@@ -16,25 +16,29 @@ class RobotController(Node):
         self.home = False
         self.xarm = XArm()
         self.get_logger().info("Initialise Robot Controller")
+        np.set_printoptions(precision=3)
 
         self.gameController = Joy()
 
-        self.timer_period = 0.01
+        self.timer_period = 0.1
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
+        self.timer2_period = 1
+        self.timer2 = self.create_timer(self.timer2_period, self.timer2_callback)
 
         self.current_joints = np.array(self.xarm.get_joints(), dtype=float)
         self.target_joints = self.current_joints.copy()
         self.commanded_joints = self.current_joints.copy()
 
         self.piCo = PIController(
-            kp=np.array([0.8, 0.8, 0.8, 0.5, 0.5, 0.5]),
-            ki=np.array([0.05, 0.05, 0.05, 0.02, 0.02, 0.02]),
+            kp=np.array([0.0, 0.01, 0.01, 1.2, 1.2, 1.2]),
+            ki=np.array([0.0, -0.1, 0.1, 0.0, 0.0, 0.0]),
+            kd=np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
             dt=self.timer_period,
-            output_limit=np.array([2.0, 2.0, 2.0, 1.0, 1.0, 1.0]),
-            integral_limit=np.array([10.0, 10.0, 10.0, 5.0, 5.0, 5.0])
+            output_limit=np.array([20.0, 20.0, 20.0, 20.0, 20.0, 20.0]),
+            #integral_limit=np.array([10.0, 10.0, 10.0, 5.0, 5.0, 5.0])
         )
 
-        self.jog_step = np.array([9.0, 9.0, 9.0, 9.0, 9.0, 9.0])
+        self.jog_step = np.array([15.0, 15.0, 15.0, 15.0, 15.0, 15.0])
         self.started = False
 
     def listener_callback(self, msg, response):
@@ -60,12 +64,19 @@ class RobotController(Node):
         self.home = should_home
 
         # Joint Mode
-        self.jointControl()
+        #self.jointControl()
 
+        # End Timer Callback
 
-        """
-        # Update target joints from joystick commands
-        self.target_joints += joystick_cmd * self.jog_step * self.timer_period
+    def timer2_callback(self):
+        # Precise Joint Control
+        self.preciseControl(np.array([0,28,-56,-1,-56,4]))
+
+        #End Timer Callback
+
+    def preciseControl(self, target_cmd):
+        # Update target joints from command
+        self.target_joints = target_cmd
 
         # store current robot joints
         self.current_joints = np.array(self.xarm.get_joints(), dtype=float)
@@ -77,10 +88,13 @@ class RobotController(Node):
         )
 
         # Commanded joint position
-        commanded_joints = self.current_joints + piMult
-        """
+        commanded_joints = self.target_joints + piMult
 
-        #End Timer Callback
+        self.get_logger().info(f"\nerr: {self.current_joints - commanded_joints}\n com: {commanded_joints}\n out: {piMult}")
+
+        self.xarm.set_joints(commanded_joints)
+        
+
 
     def jointControl(self):
         # Joint 2 Axes Conversion
@@ -108,23 +122,26 @@ class RobotController(Node):
 
 
 class PIController:
-    def __init__(self, kp, ki, dt, output_limit=None, integral_limit=None):
+    def __init__(self, kp, ki, kd, dt, output_limit=None, integral_limit=None):
         self.kp = kp
         self.ki = ki
+        self.kd = kd
         self.dt = dt
 
         self.output_limit = output_limit
         self.integral_limit = integral_limit
 
         self.integral = np.zeros(6)
+        self.prev_error = np.zeros(6)
 
     def reset(self):
         self.integral[:] = 0.0
 
     def update(self, target, measurement):
-        error = target - measurement
+        error = target - measurement 
 
         self.integral += error * self.dt
+        derivative = (error - self.prev_error) / self.dt
 
         if self.integral_limit is not None:
             self.integral = np.clip(
@@ -133,7 +150,7 @@ class PIController:
                 self.integral_limit
             )
 
-        output = self.kp * error + self.ki * self.integral
+        output = self.kp * error + self.ki * self.integral + derivative * self.kd
 
         if self.output_limit is not None:
             output = np.clip(
@@ -141,6 +158,8 @@ class PIController:
                 -self.output_limit,
                 self.output_limit
             )
+        
+        self.prev_error = error
 
         return output
 
