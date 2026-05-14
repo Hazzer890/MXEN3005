@@ -19,11 +19,12 @@ class RobotController(Node):
 
         self.gameController = Joy()
 
-        self.timer_period = 0.1
+        self.timer_period = 0.01
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
 
         self.current_joints = np.array(self.xarm.get_joints(), dtype=float)
         self.target_joints = self.current_joints.copy()
+        self.commanded_joints = self.current_joints.copy()
 
         self.piCo = PIController(
             kp=np.array([0.8, 0.8, 0.8, 0.5, 0.5, 0.5]),
@@ -33,15 +34,20 @@ class RobotController(Node):
             integral_limit=np.array([10.0, 10.0, 10.0, 5.0, 5.0, 5.0])
         )
 
-        self.jog_step = np.array([5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
+        self.jog_step = np.array([9.0, 9.0, 9.0, 9.0, 9.0, 9.0])
+        self.started = False
 
     def listener_callback(self, msg, response):
         # Instantiate gameController Inputs
         self.gameController.axes = msg.axes
         self.gameController.buttons = msg.buttons
+        self.started = True
         return response
 
     def timer_callback(self):
+        if not self.started:
+            return
+
         # Homing Arm
         should_home = self.gameController.buttons[10] == 1
         if (should_home == True and self.home == False): # is there a pythonic way to do this?
@@ -49,23 +55,15 @@ class RobotController(Node):
             self.xarm.home()
             time.sleep(2)
             self.current_joints = np.array(self.xarm.get_joints(), dtype=float)
-            self.target_joints = self.current_joints.copy()
+            self.commanded_joints = self.current_joints.copy()
             self.piCo.reset()
         self.home = should_home
 
         # Joint Mode
-        # Joint 2 Axes Conversion
-        J1 = self.gameController.axes[3]
-        J2 = self.gameController.axes[4]
-        J3 = self.gameController.axes[1]
-        J4 = self.gameController.axes[0]
-        J5 = self.gameController.axes[7]
-        J6 = self.gameController.axes[6]
-        joystick_cmd = np.array([J1, J2, J3, J4, J5, J6], dtype=float)
+        self.jointControl()
 
-        # Deadzone
-        joystick_cmd[np.abs(joystick_cmd) < 0.1] = 0.0
 
+        """
         # Update target joints from joystick commands
         self.target_joints += joystick_cmd * self.jog_step * self.timer_period
 
@@ -80,14 +78,33 @@ class RobotController(Node):
 
         # Commanded joint position
         commanded_joints = self.current_joints + piMult
-
-        self.get_logger().info(
-            f"target={self.target_joints}, current={self.current_joints}, cmd={commanded_joints}"
-        )
-
-        self.xarm.set_joints(commanded_joints, "high_acc")
+        """
 
         #End Timer Callback
+
+    def jointControl(self):
+        # Joint 2 Axes Conversion
+        J1 = self.gameController.axes[3]
+        J2 = self.gameController.axes[4]
+        J3 = self.gameController.axes[1]
+        J4 = self.gameController.axes[0]
+        J5 = self.gameController.axes[7]
+        J6 = self.gameController.axes[6]
+        joystick_cmd = np.array([J1, J2, J3, J4, J5, J6], dtype=float)
+        
+        self.current_joints = np.array(self.xarm.get_joints(), dtype=float)
+        self.get_logger().info(f"dist = {self.commanded_joints - self.current_joints}\n")
+
+        ii = 0
+        for axis in joystick_cmd:
+            if np.abs(axis) > 0.1: 
+                self.commanded_joints[ii] = axis * self.jog_step[ii] + self.xarm.get_joints()[ii]
+            ii += 1
+
+        self.get_logger().info(
+            f"target={self.target_joints}, current={self.current_joints}, cmd={self.commanded_joints}"
+        )
+        self.xarm.set_joints(self.commanded_joints, "high_acc")
 
 
 class PIController:
