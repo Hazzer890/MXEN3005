@@ -1,0 +1,3 @@
+
+Go to precise position
+ros2 topic pub /precise_joints sensor_msgs/msg/JointState "{position: [0, 28, -56, -1, -56, 4]} --once
