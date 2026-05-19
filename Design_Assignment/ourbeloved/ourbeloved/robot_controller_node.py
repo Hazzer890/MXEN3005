@@ -27,13 +27,13 @@ class RobotController(Node):
         self.timer_period = 0.05
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
 
-        self.currentrent_joints = np.array(self.xarm.get_joints(), dtype=float)
-        self.target_joints = self.currentrent_joints.copy()
-        self.commanded_joints = self.currentrent_joints.copy()
+        self.current_joints = np.array(self.xarm.get_joints(), dtype=float)
+        self.target_joints = self.current_joints.copy()
+        self.commanded_joints = self.current_joints.copy()
 
         self.piCo = PIController(
-            kp=np.array([0.8, 0.8, 0.8, 0.5, 0.5, 0.5]),
-            ki=np.array([0.05, 0.05, 0.05, 0.02, 0.02, 0.02]),
+            kp=np.array([1, 1, 1, 1, 1, 1]),
+            ki=np.array([1, 1, 1, 1, 1, 0.1]),
             dt=self.timer_period,
             output_limit=np.array([2.0, 2.0, 2.0, 1.0, 1.0, 1.0]),
             integral_limit=np.array([10.0, 10.0, 10.0, 5.0, 5.0, 5.0])
@@ -57,8 +57,8 @@ class RobotController(Node):
         self.settled_count = 0
         self.tolerance = 0.1
         self.phase = 'initial'  # ()'initial' 'moving' 'pi')
-        self.precise_goal = self.currentrent_joints.copy()
-        self.prev_joints = self.currentrent_joints.copy()
+        self.precise_goal = self.current_joints.copy()
+        self.prev_joints = self.current_joints.copy()
 
         self.WITHIN_CYCLES = 5
         self.SETTLE_CYCLES = 5
@@ -96,8 +96,8 @@ class RobotController(Node):
             self.get_logger().info("Home Robot Joints")
             self.xarm.home()
             time.sleep(2)
-            self.currentrent_joints = np.array(self.xarm.get_joints(), dtype=float)
-            self.commanded_joints = self.currentrent_joints.copy()
+            self.current_joints = np.array(self.xarm.get_joints(), dtype=float)
+            self.commanded_joints = self.current_joints.copy()
             self.piCo.reset()
             self.within_tolerance = True
         self.home = should_home
@@ -194,20 +194,17 @@ class RobotController(Node):
                 if self.control_mode == 'cartesian':
                     self.xarm.set_joints(tuple(self.commanded_joints))
                 else:
-                    self.xarm.set_joints(
-                        tuple(self.commanded_joints), "high_acc",
-                        velocities=self.tune_vel
-                    )
+                    self.xarm.set_joints(tuple(self.commanded_joints), "high_acc", velocities=self.tune_vel)
             else:
                 self.get_logger().info(
                     f"Rejected invalid target {np.round(target, 2)}"
                 )
             self.drift = True
         else:
-            self.currentrent_joints = np.array(self.xarm.get_joints(), dtype=float)
+            self.current_joints = np.array(self.xarm.get_joints(), dtype=float)
             if self.drift:
-                self.xarm.set_joints(tuple(self.currentrent_joints))
-                self.commanded_joints = self.currentrent_joints.copy()
+                self.xarm.set_joints(tuple(self.current_joints))
+                self.commanded_joints = self.current_joints.copy()
                 self.drift = False
 
     def jointControl(self):
@@ -220,22 +217,23 @@ class RobotController(Node):
         J6 = self.gameController.axes[6]
         joystick_cmd = np.array([J1, J2, J3, J4, J5, J6], dtype=float)
 
-        self.currentrent_joints = np.array(self.xarm.get_joints(), dtype=float)
-        target = self.currentrent_joints.copy()
+        self.current_joints = np.array(self.xarm.get_joints(), dtype=float)
+        target = self.commanded_joints.copy()
         for ii, axis in enumerate(joystick_cmd):
             if np.abs(axis) > self.deadzone:
-                target[ii] = axis * self.jog_step[ii] + self.currentrent_joints[ii]
+                target[ii] = axis * self.jog_step[ii] + self.current_joints[ii]
 
         self.get_logger().info(
-            f"currentrent={np.round(self.currentrent_joints, 2)} "
+            f"currentrent={np.round(self.current_joints, 2)} "
             f"cmd={np.round(target, 2)}"
         )
         return target
 
     def cartesianControl(self):
-        diff_x = self.gameController.axes[4]
-        diff_y = self.gameController.axes[3]
-        diff_z = self.gameController.axes[1]
+        cart_step = 5
+        diff_x = self.gameController.axes[4]*cart_step
+        diff_y = -self.gameController.axes[3]*cart_step
+        diff_z = self.gameController.axes[1]*cart_step
 
         present_htm, _ = fk(self.commanded_joints)
         goal_htm = present_htm.copy()
@@ -277,9 +275,13 @@ class RobotController(Node):
 
     def attackControl(self):
         # game-style
+        joint0 = self.commanded_joints[0]
+        joint4 = self.commanded_joints[4]
         current = np.array(self.xarm.get_joints(), dtype=float)
-        joint0 = self.gameController.axes[3] + current[0]
-        joint4 = self.gameController.axes[4] + current[4]
+        if np.abs(self.gameController.axes[3]) > self.deadzone:
+            joint0 = np.power(self.gameController.axes[3], 3)*self.jog_step[0] + current[0] # Cubing input for more game like control
+        if np.abs(self.gameController.axes[4]) > self.deadzone:
+            joint4 = np.power(self.gameController.axes[4], 3)*self.jog_step[4] + current[4]
         return np.array([joint0, 70.0, -20.0, 0.0, joint4, 0.0], dtype=float)
 
 
