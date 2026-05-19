@@ -13,7 +13,7 @@ class Fire_Controller(Node):
         self.publisher = self.create_publisher(Bool, "/fire", 10)
         self.fire = False
 
-    def listener_callback(self, msg, response):
+    def listener_callback(self, msg):
         should_fire = msg.axes[5] < 0
 
         if (should_fire == False and self.fire == True):
@@ -28,7 +28,6 @@ class Fire_Controller(Node):
             self.publisher.publish(bool_publish)
         
         self.fire = should_fire
-        return response
 
 def main(args=None):
     try:

@@ -32,7 +32,8 @@ setup(
         'console_scripts': [
             'fire_controller_node = ourbeloved.fire_controller_node:main',
             'robot_controller_node = ourbeloved.robot_controller_node:main',
-
+            'joint_state_node = ourbeloved.joint_state_node:main',
+            'joint_state_node_deg = ourbeloved.joint_state_node_deg:main',
         ],
     },
 )
